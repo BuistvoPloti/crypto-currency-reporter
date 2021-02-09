@@ -1,0 +1,53 @@
+Resources:
+  currenciesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: ${self:custom.settings.BPI_TABLE}
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:provider.stage}-user-pool
+      AliasAttributes:
+        - preferred_username
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:provider.stage}-user-pool-client
+      UserPoolId:
+        Ref: CognitoUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+      GenerateSecret: false
+      SupportedIdentityProviders: ["COGNITO"]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows: ["code"]
+      CallbackURLs: ["https://aws-auth.herokuapp.com/signin"]
+      DefaultRedirectURI: "https://aws-auth.herokuapp.com/signin"
+      AllowedOAuthScopes: ["openid"]
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: bitcoin-price-index
+      UserPoolId:
+        Ref: CognitoUserPool
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoUserPool
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      ProviderARNs:
+        - Fn::GetAtt:
+            - CognitoUserPool
+            - Arn

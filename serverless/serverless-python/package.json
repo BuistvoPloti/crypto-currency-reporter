@@ -1,0 +1,13 @@
+{
+  "name": "mylambda",
+  "version": "1.0.0",
+  "scripts": {
+    "lambda": "serverless invoke local --function",
+    "deploy": "sls deploy"
+  },
+  "author": "den",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-python-requirements": "^5.1.0"
+  }
+}

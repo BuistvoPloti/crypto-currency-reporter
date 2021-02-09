@@ -1,0 +1,48 @@
+service: sls
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  settings:
+    BPI_TABLE: BTCPriceIndex
+
+provider:
+  name: aws
+  runtime: python3.7
+  lambdaHashingVersion: 20201221
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - cloudformation:DescribeStackResource
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.BPI_TABLE}"
+
+functions:
+  putCryptoCurrency:
+    handler: src.handlers.put_crypto_currency.handler
+    events:
+      - schedule:
+          rate: rate(10 minutes)
+  getCurrencies:
+    handler: src.handlers.get_currencies.handler
+    events:
+      - http:
+          path: /currencies
+          method: get
+          cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - openid
+          integration: lambda
+
+resources:
+  Resources: ${file(./CloudFormation.yml):Resources}

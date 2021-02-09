@@ -1,0 +1,25 @@
+{
+  "name": "mylambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "putCryptoCurrency.js",
+  "scripts": {
+    "lambda": "serverless invoke local --function",
+    "deploy": "sls deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.836.0",
+    "axios": "^0.21.1",
+    "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-security": "^1.4.0"
+  }
+}
